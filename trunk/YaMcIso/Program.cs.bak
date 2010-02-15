@@ -1,0 +1,138 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Reflection;
+using System.Text;
+using com.mojang.minecraft.level;
+
+
+namespace YaMcIso
+{
+	class Program
+	{
+		static void Main(string[] args)
+		{
+			try
+			{
+				CommandConfig.LoadConfig(args);
+			}
+			catch (ArgumentException ex)
+			{
+				Console.WriteLine("Error: {0}", ex.Message);
+				Console.WriteLine(CommandConfig.Usage());
+				return;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine("An unknown exception occurred: {0}", ex.Message);
+				Console.WriteLine(ex.StackTrace);
+				return;
+			}
+
+			try
+			{
+				CommandConfig.ValidateConfig();
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine("Error: {0}", ex.Message);
+				Console.WriteLine(CommandConfig.Usage());
+				return;
+			}
+
+			if (!File.Exists(CommandConfig.MapFile))
+			{
+				Console.WriteLine("Unable to load level: {0}", CommandConfig.MapFile);
+				return;
+			}
+
+			Level mcLevel = Level.Load(CommandConfig.MapFile);
+
+			Assembly currentAssembly = Assembly.GetExecutingAssembly();
+
+			string tileset = string.Format("images.isometric{0}.png", CommandConfig.UseHighQuality
+																		 ? "hq"
+																		 : CommandConfig.UseLowQuality ? "lq" : "");
+			Stream tilesetStream = currentAssembly.GetManifestResourceStream(tileset);
+			if (tilesetStream == null)
+			{
+				Console.WriteLine("Unable to load tileset.");
+				return;
+			}
+
+			Image imgOrig = Image.FromStream(tilesetStream);
+			List<Bitmap> images = new List<Bitmap>();
+			int imgWidth = imgOrig.Width;
+			int imgHeight = imgOrig.Height;
+			for (int idx = 0; idx < imgWidth / imgHeight; idx++)
+			{
+				Bitmap bmpBlock = new Bitmap(imgHeight, imgHeight);
+				using (Graphics gBlock = Graphics.FromImage(bmpBlock))
+				{
+					gBlock.DrawImage(imgOrig, new Rectangle(0, 0, imgHeight, imgHeight),
+									 new Rectangle(idx * imgHeight, 0, imgHeight, imgHeight),
+									 GraphicsUnit.Pixel);
+				}
+				images.Add(bmpBlock);
+			}
+
+			int bmpWidth = imgHeight * mcLevel.width;
+			int bmpHeight = (int)(bmpWidth * .75);
+			using (Bitmap bmp = new Bitmap(bmpWidth + (imgHeight * 3), bmpHeight + (imgHeight * 3)))
+			{
+				using (Graphics g = Graphics.FromImage(bmp))
+				{
+					List<int> layers = new List<int>();
+					for (int l = 0; l <= mcLevel.height; l++)
+					{
+						layers.Add(l);
+					}
+
+					for (int layerIdx = 0; layerIdx < layers.Count; layerIdx++)
+					{
+						int y = layers[layerIdx];
+						if (y < mcLevel.height)
+						{
+							for (int x = 0; x < mcLevel.width; x++)
+							{
+								for (int z = 0; z < mcLevel.depth; z++)
+								{
+									int block = mcLevel.GetTile(x, y, z);
+									if (block > 0 && block < images.Count)
+									{
+										try
+										{
+											g.DrawImageUnscaled(images[block],
+																(x * (imgHeight / 2)) + (bmpWidth / 2) - (z * (imgHeight / 2)),
+																(z * (imgHeight / 4)) + (x * (imgHeight / 4)) -
+																(y * (imgHeight / 2)) + (bmpHeight / 4));
+										}
+										catch (Exception)
+										{
+											// More than likely a new type of block was found that hasn't been
+											// added to the tileset yet.
+											// Console.WriteLine("Block failed: ({0}, {1}, {2})", x, y, z);
+
+										}
+									}
+								}
+							}
+						}
+					}
+
+					if (CommandConfig.Output.Length > 0)
+					{
+						bmp.Save(CommandConfig.Output, ImageFormat.Png);
+						Console.WriteLine("Saved image to {0}", CommandConfig.Output);
+					}
+				}
+			}
+			for (int idx = 0; idx < images.Count; idx++)
+			{
+				images[idx].Dispose();
+			}
+		}
+	}
+}
