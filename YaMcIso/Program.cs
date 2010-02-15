@@ -75,7 +75,7 @@ namespace YaMcIso
 					}
 				}
 
-				Console.WriteLine("Slice " + x + "/" + lvl.width);
+				Console.WriteLine("Slice " + (x+1) + "/" + lvl.width);
 			}
 
 			flag.Save(CommandConfig.Output, System.Drawing.Imaging.ImageFormat.Png);
