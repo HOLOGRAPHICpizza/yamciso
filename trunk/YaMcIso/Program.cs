@@ -65,12 +65,17 @@ namespace YaMcIso
 					{
 						if (lvl.GetTile(x, y, z).ToString() != "Air")
 						{
-							drawBlock(flag, x, z, y, lvl.GetTile(x, y, z));
+                            if (checkValidBlock(lvl.GetTile(x+1, y, z)) ||
+                                checkValidBlock(lvl.GetTile(x, y+1, z)) ||
+                                checkValidBlock(lvl.GetTile(x, y, z+1)))
+                            {
+                                drawBlock(flag, x, z, y, lvl.GetTile(x, y, z));
+                            }
 						}
 					}
 				}
 
-				Console.WriteLine("Slice " + (x+1) + "/" + lvl.width);
+				Console.WriteLine("Slice " + x + "/" + lvl.width);
 			}
 
 			flag.Save(CommandConfig.Output, System.Drawing.Imaging.ImageFormat.Png);
@@ -80,6 +85,22 @@ namespace YaMcIso
 
 			Console.WriteLine(CommandConfig.Output + " rendered successfully!");
 		}
+
+        static bool checkValidBlock(Tile tile)
+        {
+            if (tile.ToString() == "Air" ||
+                tile.ToString() == "Water" ||
+                tile.ToString() == "Glass" ||
+                tile.ToString() == "StillWater"
+                )
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
 		static void processImage(String file, int width)
 		{
