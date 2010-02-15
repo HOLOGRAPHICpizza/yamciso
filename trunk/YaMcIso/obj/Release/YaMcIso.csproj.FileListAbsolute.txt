@@ -4,3 +4,9 @@ C:\Documents and Settings\Joey\My Documents\Visual Studio 2008\Projects\YaMcIso\
 C:\Documents and Settings\Joey\My Documents\Visual Studio 2008\Projects\YaMcIso\YaMcIso\obj\Release\ResolveAssemblyReference.cache
 C:\Documents and Settings\Joey\My Documents\Visual Studio 2008\Projects\YaMcIso\YaMcIso\obj\Release\YaMcIso.exe
 C:\Documents and Settings\Joey\My Documents\Visual Studio 2008\Projects\YaMcIso\YaMcIso\obj\Release\YaMcIso.pdb
+C:\Users\michael\Documents\Visual Studio 2008\Projects\YaMcIso\YaMcIso\obj\Release\YaMcIso.exe
+C:\Users\michael\Documents\Visual Studio 2008\Projects\YaMcIso\YaMcIso\obj\Release\YaMcIso.pdb
+C:\Users\michael\Documents\Visual Studio 2008\Projects\YaMcIso\YaMcIso\bin\Release\Readme.txt
+C:\Users\michael\Documents\Visual Studio 2008\Projects\YaMcIso\YaMcIso\bin\Release\YaMcIso.exe
+C:\Users\michael\Documents\Visual Studio 2008\Projects\YaMcIso\YaMcIso\bin\Release\YaMcIso.pdb
+C:\Users\michael\Documents\Visual Studio 2008\Projects\YaMcIso\YaMcIso\obj\Release\ResolveAssemblyReference.cache
