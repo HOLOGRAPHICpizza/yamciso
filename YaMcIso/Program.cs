@@ -8,7 +8,6 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Diagnostics;
-using com.mojang.minecraft.level;
 
 
 namespace YaMcIso
@@ -52,59 +51,30 @@ namespace YaMcIso
             }
 
             Console.WriteLine("Loading Level...");
-
-            Level lvl = Level.Load(CommandConfig.MapFile);
-
-            int lvlwidth = lvl.width;
-            int lvldepth = lvl.depth;
-            int lvlheight = lvl.height;
-
-			// Copy level into array for better performance
-			fTile[,,] lvlArray = new fTile[lvlwidth,lvldepth,lvlheight];
-			for (int x = 0; x < lvlwidth; x++)
-			{
-				for (int y = 0; y < lvldepth; y++)
-				{
-					for (int z = 0; z < lvlheight; z++)
-					{
-						lvlArray[x, y, z] = new fTile(lvl.GetTile(x,y,z));
-					}
-				}
-
-				Console.WriteLine("Loaded " + (x + 1) + "/" + lvlwidth);
-			}
+            gLevel lvl = new gLevel(CommandConfig.MapFile);
 
 			// Begin drawing the image.
 			Console.WriteLine("\nRendering Level...");
 			System.Drawing.Bitmap flag = new System.Drawing.Bitmap((1024 + 128) * 2, (1500 + 64) * 2);
-			Boolean Xclear = true;
-			Boolean Yclear = true;
-			Boolean Zclear = true;
-            for (int x = 0; x < lvlwidth; x++)
+            for (int x = 0; x < lvl.width; x++)
             {
-                for (int y = 0; y < lvldepth; y++)
+                for (int y = 0; y < lvl.length; y++)
                 {
-                    for (int z = 0; z < lvlheight; z++)
+                    for (int z = 0; z < lvl.height; z++)
                     {
-						if (!lvlArray[x, y, z].isAir)
+						if (!lvl.getTile(x, y, z).isAir)
                         {
-
-							Xclear = true;
-							Yclear = true;
-							Zclear = true;
-							if (x + 1 < lvlwidth) { Xclear = lvlArray[x + 1, y, z].transparent; }
-							if (y + 1 < lvldepth) { Yclear = lvlArray[x, y + 1, z].transparent; }
-							if (z + 1 < lvlheight) { Zclear = lvlArray[x, y, z + 1].transparent; }
-
-                            if ( Xclear || Yclear || Zclear )
+							if (lvl.getTile(x + 1, y, z).transparent ||
+								lvl.getTile(x, y + 1, z).transparent ||
+								lvl.getTile(x, y, z + 1).transparent)
                             {
-								drawBlock(flag, x, z, y, lvlArray[x, y, z]);
+								drawBlock(flag, x, z, y, lvl.getTile(x, y, z));
                             }
                         }
                     }
                 }
 
-				Console.WriteLine("Rendered " + (x + 1) + "/" + lvlwidth);
+				Console.WriteLine("Rendered " + (x + 1) + "/" + lvl.width);
             }
 
             flag.Save(CommandConfig.Output, System.Drawing.Imaging.ImageFormat.Png);
@@ -115,6 +85,7 @@ namespace YaMcIso
             Console.WriteLine(CommandConfig.Output + " rendered successfully!");
         }
 
+		// TODO: Make this call ImageMagick directly, instead of using an external exe.
         static void processImage(String file, int width)
         {
             String resize = "";
