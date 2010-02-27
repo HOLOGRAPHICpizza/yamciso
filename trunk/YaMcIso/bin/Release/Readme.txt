@@ -1,9 +1,9 @@
 ﻿YaMcIso
 Yet another Minecraft Isometric image renderer
-Renders an isometric view of a dat format Minecraft level to a transparent png.
+Renders an isometric view of a dat or NBT (.mclevel) format Minecraft level to a transparent png.
 
 Application Parameters:
--map		The Minecraft dat file to render.
+-map		The Minecraft map file to render.
 
 -out		Filename of the png to save.
 
@@ -19,6 +19,7 @@ Credits:
 HOLOGRAPHICpizza (Michael Craft) - Put together YaMcIso.
 joeyjo0 - Contributed the majority of the rendering code.
 aphistic (Erik Davidson) mciso - Various code.
+aphistic - LibNBT / LibMinecraft
 Notch - Minecraft libraries.
 OpenJDK
 ImageMagick
